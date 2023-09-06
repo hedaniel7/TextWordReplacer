@@ -2,6 +2,7 @@
 // Created by he_da on 9/6/23.
 //
 #include "TextWordReplacer.h"
+#include <algorithm>
 
 TextWordReplacer::TextWordReplacer() {
     // Populate the replacement map with words and their generic counterparts
@@ -12,12 +13,22 @@ TextWordReplacer::TextWordReplacer() {
 
 std::string TextWordReplacer::replaceWithGenericWords(const std::string& input) {
     std::string output = input;
+    std::string lowercaseInput = input;
+
+    // Convert the input string to lowercase for searching
+    std::transform(lowercaseInput.begin(), lowercaseInput.end(), lowercaseInput.begin(), ::tolower);
+
     for (const auto& pair : replacementMap) {
-        size_t pos = output.find(pair.first);
+        std::string lowercaseWord = pair.first;
+        std::transform(lowercaseWord.begin(), lowercaseWord.end(), lowercaseWord.begin(), ::tolower);
+
+        size_t pos = lowercaseInput.find(lowercaseWord);
         while (pos != std::string::npos) {
             output.replace(pos, pair.first.length(), pair.second);
-            pos = output.find(pair.first, pos + pair.second.length());
+            lowercaseInput.replace(pos, pair.first.length(), pair.second); // update the lowercaseInput as well
+            pos = lowercaseInput.find(lowercaseWord, pos + pair.second.length());
         }
     }
     return output;
 }
+
